@@ -111,3 +111,21 @@ Use `python main_comms.py --help` for a full list of command-line options.
 
 ### Note
 This environment is computationally intensive. Training for a large number of episodes or with many agents may take a significant amount of time, even with GPU acceleration. Monitor system resources and adjust parameters as necessary.
+
+## Demo
+A demonstration of a how trained models (friendly agents) interact within the environment against one of the opponent configurations ('R-L_MTC').
+- Blue Boxes represent the friendly agents 
+- Red Boxes represent the enemy agents
+- Letters w/in agents indicate their type S - Scout / A - Artillery / L - Light Tank / I - Infantry / C - Commander
+- Yellow to Dark Orange shaded boxes represents the agents' visibility range (color scale indicates overlapping visibility)
+- Red Rings indicate the agents' engagement range
+- Small Red Circles indicate when an agent identifies a target (temporarily appear)
+- Red Lines indicate firing from enemy agents (temporarily appear)
+- Green Lines indicate firing from friendly agents (temporarily appear)
+- Cyan Lines indicate communication from scouts to commander (temporarily appear)
+- Yellow lines indicate communication from commander to artillery (temporarily appear)
+- Black Boxes represent destroyed agents
+
+#### Demo Video
+![Demo](https://github.com/ModSim-Steve/IDS_6819_Moore/blob/main/friendly_vs_RLMTC_last.mp4)
+
