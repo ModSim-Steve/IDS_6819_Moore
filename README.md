@@ -24,7 +24,7 @@ Implements 'OpposingConfigComms' class, which defines opponent behavior.
 Provides functions for adjusting difficulty (pseudo curriculum training approach) and loading trained models for more difficult opponent.
 
 ### Training Process File
-#### *combined_arms_TRN_process_comms.py*
+![combined_arms_TRN_process_comms.py](https://github.com/ModSim-Steve/IDS_6819_Moore/blob/main/combined_arms_TRN_process_comms.py)
 
 Implements the main training loop by handling the episode iterations, reward calculations, and model updates.
 Provides functions for logging and visualization of training results.
