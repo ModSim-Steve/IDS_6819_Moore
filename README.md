@@ -113,6 +113,7 @@ Use `python main_comms.py --help` for a full list of command-line options.
 This environment is computationally intensive. Training for a large number of episodes or with many agents may take a significant amount of time, even with GPU acceleration. Monitor system resources and adjust parameters as necessary.
 
 ## Demo
+![Demo-gif]()
 A demonstration of a how trained models (friendly agents) interact within the environment against one of the opponent configurations ('R-L_MTC').
 - Blue Boxes represent the friendly agents 
 - Red Boxes represent the enemy agents
