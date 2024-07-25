@@ -36,7 +36,7 @@ Entry point for running the training process.
 Parses command-line arguments and sets up the training configuration
 
 ### Reward Debug File
-#### *reward_debug_logger_comms.py*
+![reward_debug_logger_comms.py](https://github.com/ModSim-Steve/IDS_6819_Moore/blob/main/reward_debug_logger_comms.py)
 
 Debugging tool for analyzing the reward structure.
 Provides detailed logging of rewards and agent actions
