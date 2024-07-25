@@ -1,4 +1,6 @@
 # **Combined Arms MARL Environment w/DQN & Communication**
+![Environment Screenshot](https://github.com/ModSim-Steve/IDS_6819_Moore/blob/main/Env_Screenshot.png)
+
 ## General Purpose
 This project implements a multi-agent reinforcement learning environment simulating combined arms operations with communication capabilities. The environment models a battlefield scenario where different types of units (e.g., scouts, artillery, commanders) from two opposing teams interact. The key feature of this environment is the incorporation of a communication system that allows scouts to relay enemy positions to commanders, who then communicate this information to artillery units.
 
