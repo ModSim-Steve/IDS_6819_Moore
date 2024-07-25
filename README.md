@@ -12,7 +12,7 @@ Implements the 'CombinedArmsRLEnvMAComms' class, which defines the state space, 
 Handles agent movement, combat, and communication.
 
 ### Deep Q-Network File
-#### *combined_arms_dqn_agent_comms.py*
+![combined_arms_dqn_agent_comms.py](https://github.com/ModSim-Steve/IDS_6819_Moore/blob/main/combined_arms_dqn_agent_comms.py)
 
 Implements the 'DQNAgentComms' class, which defines the Deep Q-Network (DQN) architecture and training process for individual agents.
 Handles experience replay and target network updates.
