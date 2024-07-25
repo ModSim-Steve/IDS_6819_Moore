@@ -30,7 +30,7 @@ Implements the main training loop by handling the episode iterations, reward cal
 Provides functions for logging and visualization of training results.
 
 ### Main File
-#### *main_comms.py*
+![main_comms.py](https://github.com/ModSim-Steve/IDS_6819_Moore/blob/main/main_comms.py)
 
 Entry point for running the training process.
 Parses command-line arguments and sets up the training configuration
