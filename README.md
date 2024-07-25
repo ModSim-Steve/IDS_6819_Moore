@@ -6,7 +6,7 @@ This project implements a multi-agent reinforcement learning environment simulat
 
 ## Files
 ### Environment File 
-#### *combined_arms_rl_env_MA_comms.py*
+![combined_arms_rl_env_MA_comms.py](https://github.com/ModSim-Steve/IDS_6819_Moore/blob/main/combined_arms_rl_env_MA_comms.py)
 
 Implements the 'CombinedArmsRLEnvMAComms' class, which defines the state space, action space, and core environment dynamics.
 Handles agent movement, combat, and communication.
