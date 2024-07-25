@@ -18,7 +18,7 @@ Implements the 'DQNAgentComms' class, which defines the Deep Q-Network (DQN) arc
 Handles experience replay and target network updates.
 
 ### Opposing Side Training Configuration File
-#### *combined_arms_TRN_configs_comms.py*
+![combined_arms_TRN_configs_comms.py](https://github.com/ModSim-Steve/IDS_6819_Moore/blob/main/combined_arms_TRN_configs_comms.py)
 
 Implements 'OpposingConfigComms' class, which defines opponent behavior.
 Provides functions for adjusting difficulty (pseudo curriculum training approach) and loading trained models for more difficult opponent.
