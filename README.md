@@ -113,8 +113,10 @@ Use `python main_comms.py --help` for a full list of command-line options.
 This environment is computationally intensive. Training for a large number of episodes or with many agents may take a significant amount of time, even with GPU acceleration. Monitor system resources and adjust parameters as necessary.
 
 ## Demo
-![Demo-gif](https://github.com/ModSim-Steve/IDS_6819_Moore/blob/main/friendly_vs_RLMTC_last-ezgif.com-video-to-gif-converter.gif)
-### *A demonstration of a how trained models (friendly agents) interact within the environment against one of the opponent configurations ('R-L_MTC').*
+  ![Demo-gif](https://github.com/ModSim-Steve/IDS_6819_Moore/blob/main/friendly_vs_RLMTC_last-ezgif.com-video-to-gif-converter.gif)
+
+  *A demonstration of a how trained models (friendly agents) interact within the environment against one of the opponent configurations ('R-L_MTC').*
+  
 - Blue Boxes represent the friendly agents 
 - Red Boxes represent the enemy agents
 - Letters w/in agents indicate their type S - Scout / A - Artillery / L - Light Tank / I - Infantry / C - Commander
@@ -130,3 +132,19 @@ This environment is computationally intensive. Training for a large number of ep
 #### Demo Video
 ![Demo](https://github.com/ModSim-Steve/IDS_6819_Moore/blob/main/friendly_vs_RLMTC_last.mp4)
 
+## Future Experiments
+- Communication:
+  - Global Observations w/Local Observations. Instead of directing a protocol for communication [**kill chain:** scout (*detect enemy*) --> commander --> artillery (*engage enemy*)], determine if the agents can develop one based soley on sending / accessing information to / from the 'Global' observations.  The idea is that the agents will learn how to exploit each of the various agents' attributes (observation range & engagement range) given the basic reward structure (no communication rewards).  The initial experiment is essentially RIAL where communication is an action.  This additional experiment is essentially DIAL.  Metrics to monitor - computational time per episode, computational time per training session (how many episodes are required to reach optimality), difference in performance (how many agents survive the assault - average over 100 episode test).  *See Jakob Foerster's "Learning to Communicate with Deep Multi-Agent Reinforcement Learning" for details regarding the inspiration for this experiment.*
+  - Hierarchical Structure. Determine if differing groups of agents who have been trained to learn different policies (fires & manuever) can develop a "combined arms" policy through the use of graph neural networks.  The idea is that the 2 - 3 different groups of agents will learn to reduce the opposing force before conducting the assault.  *See Junji Sheng et al's "Learning Structured Communication for Multi-Agent Reinforcement Learning"*
+
+- Environment Adjustments:
+  - Reward Shaping: Determine the best method of incentivizing the agents to reach the desired outcome (without too much bias).  From the initial experiment's results (demo video above), it appeared as if the agents were not leveraging the other's unqiue attributes (scout's observation range & artillery's engagement range) and they were being too conservative (defensive).  With a few modifications to the reward structure (increased detection reward, increased firing reward, increased communication rewards, and modification to the team reward weights), the agents were able to successfully repel the assault.
+    
+    ![Increased Reward Demo](https://github.com/ModSim-Steve/IDS_6819_Moore/blob/main/friendly_vs_RLMTC_last_diffrewards-ezgif.com-video-to-gif-converter.gif)
+
+    Although the results were better than the initial experiment, additional increased adjustments to the artillery's rewards might entice the agents to destroy the enemy faster.   
+
+  - Environment Adjustments:
+      - Add concealment / terrain to mask movements and extend observation range.  Determine if the agents can identify key terrain.
+      - Add objectives.  Determine if the presense of objectives affects selected avenue of approach.
+      - Force Ratio.  Determine if increased friendly agents affects the selection of offense / defense approach.
