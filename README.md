@@ -9,36 +9,42 @@ This project implements a multi-agent reinforcement learning environment simulat
 ![combined_arms_rl_env_MA_comms.py](https://github.com/ModSim-Steve/IDS_6819_Moore/blob/main/combined_arms_rl_env_MA_comms.py)
 
 Implements the 'CombinedArmsRLEnvMAComms' class, which defines the state space, action space, and core environment dynamics.
+
 Handles agent movement, combat, and communication.
 
 ### Deep Q-Network File
 ![combined_arms_dqn_agent_comms.py](https://github.com/ModSim-Steve/IDS_6819_Moore/blob/main/combined_arms_dqn_agent_comms.py)
 
 Implements the 'DQNAgentComms' class, which defines the Deep Q-Network (DQN) architecture and training process for individual agents.
+
 Handles experience replay and target network updates.
 
 ### Opposing Side Training Configuration File
 ![combined_arms_TRN_configs_comms.py](https://github.com/ModSim-Steve/IDS_6819_Moore/blob/main/combined_arms_TRN_configs_comms.py)
 
 Implements 'OpposingConfigComms' class, which defines opponent behavior.
+
 Provides functions for adjusting difficulty (pseudo curriculum training approach) and loading trained models for more difficult opponent.
 
 ### Training Process File
 ![combined_arms_TRN_process_comms.py](https://github.com/ModSim-Steve/IDS_6819_Moore/blob/main/combined_arms_TRN_process_comms.py)
 
 Implements the main training loop by handling the episode iterations, reward calculations, and model updates.
+
 Provides functions for logging and visualization of training results.
 
 ### Main File
 ![main_comms.py](https://github.com/ModSim-Steve/IDS_6819_Moore/blob/main/main_comms.py)
 
 Entry point for running the training process.
+
 Parses command-line arguments and sets up the training configuration
 
 ### Reward Debug File
 ![reward_debug_logger_comms.py](https://github.com/ModSim-Steve/IDS_6819_Moore/blob/main/reward_debug_logger_comms.py)
 
 Debugging tool for analyzing the reward structure.
+
 Provides detailed logging of rewards and agent actions
 
 
@@ -77,8 +83,8 @@ The following standard Python libraries are used and should be available in most
 ### Hardware Requirements
 
 For optimal performance, a CUDA-capable NVIDIA GPU is recommended.
+
 Minimum 8GB RAM, 16GB or more recommended for larger simulations.
-Multi-core CPU for parallel processing of agent actions.
 
 ### Software Requirements
 
