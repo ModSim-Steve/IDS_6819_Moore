@@ -369,8 +369,6 @@ class CombinedArmsRLEnvMAComms(gym.Env):
                 elif action == 10:  # Hold position
                     pass
 
-        self._process_communication()
-
         # Allow artillery to act on communicated information
         for agent in self.friendly_agents:
             if agent["type"] == "artillery" and agent["health"] > 0:
@@ -495,22 +493,27 @@ class CombinedArmsRLEnvMAComms(gym.Env):
 
         Side effects:
             Updates the communication_data dictionary with new information.
+            Triggers communication processing for commanders.
         """
         if agent["type"] == "scout" and agent['team'] == 'friendly':
+            # Create a frozen set of detected enemy positions
             current_state = frozenset((enemy["id"], tuple(enemy["position"])) for enemy in agent["detected_enemies"] if
                                       enemy['team'] != agent['team'])
 
+            # Check if the current state is different from the last communicated state
             if current_state != self.communication_data["last_communicated"].get(agent["id"], frozenset()):
-                # Check if there's a living commander to communicate with
+                # Find living commanders to communicate with
                 living_commanders = [commander for commander in self.friendly_agents
                                      if commander["type"] == "commander" and commander["health"] > 0]
 
                 if living_commanders:
+                    # Communicate with all living commanders
                     for commander in living_commanders:
                         self.communication_data["network"][commander["id"]].append(agent["id"])
                         self.episode_comm_stats['scout_to_commander'][agent['id']] += 1
                         logging.info(f"Scout {agent['id']} communicated with Commander {commander['id']}")
 
+                    # Update the last communicated state and detected enemies
                     self.communication_data["last_communicated"][agent["id"]] = current_state
                     self.communication_data["detected_enemies"][agent["id"]] = [
                         {"id": enemy["id"], "position": enemy["position"], "health": enemy["health"]}
@@ -521,40 +524,51 @@ class CombinedArmsRLEnvMAComms(gym.Env):
                     logging.info(f"Scout {agent['id']} attempted to communicate but no living commanders available")
 
         elif agent["type"] == "commander" and agent['team'] == 'friendly':
+            # Create a frozen set of all current enemy positions known to this commander
             current_state = frozenset(
-                (scout_id, frozenset((e["id"], tuple(e["position"])) for e in
-                                     self.communication_data["detected_enemies"].get(scout_id, [])))
+                (enemy["id"], tuple(enemy["position"]))
                 for scout_id in self.communication_data["network"].get(agent["id"], [])
+                for enemy in self.communication_data["detected_enemies"].get(scout_id, [])
             )
 
+            # Check if the current state is different from the last communicated state
             if current_state != self.communication_data["last_communicated"].get(agent["id"], frozenset()):
-                # Check if there's a living artillery to communicate with
-                living_artillery = [artillery for artillery in self.friendly_agents
-                                    if artillery["type"] == "artillery" and artillery["health"] > 0]
+                # Process and communicate the new information
+                self._process_communication(agent["id"])
+                # Update the last communicated state for this commander
+                self.communication_data["last_communicated"][agent["id"]] = current_state
+                logging.info(f"Commander {agent['id']} processed and communicated new information")
+            else:
+                logging.info(f"Commander {agent['id']} attempted to communicate but had no new information")
 
-                if living_artillery:
-                    for artillery in living_artillery:
-                        self.communication_data["network"][artillery["id"]].append(agent["id"])
-                        self.episode_comm_stats['commander_to_artillery'][agent['id']] += 1
-                        logging.info(f"Commander {agent['id']} communicated with Artillery {artillery['id']}")
-
-                    self.communication_data["last_communicated"][agent["id"]] = current_state
-                else:
-                    logging.info(f"Commander {agent['id']} attempted to communicate but no living artillery available")
-
-    def _process_communication(self):
+    def _process_communication(self, commander_id):
         """
-        Process all communications for the current step.
+        Process communications for a specific commander.
+
+        Args:
+            commander_id (str): The ID of the commander processing communications.
 
         Side effects:
             Updates the communication_data["targets"] with communicated enemy positions.
         """
-        self.communication_data["targets"].clear()  # Clear previous communicated targets
-        for commander in self.friendly_agents:
-            if commander["type"] == "commander":
-                for scout_id in self.communication_data["network"].get(commander["id"], []):
-                    for enemy in self.communication_data["detected_enemies"].get(scout_id, []):
-                        self.communication_data["targets"][enemy["id"]] = enemy["position"]
+        # Clear previous communicated targets
+        self.communication_data["targets"].clear()
+
+        # Process communications from commanders to artillery
+        # Get all scouts that communicated with this commander
+        for scout_id in self.communication_data["network"].get(commander_id, []):
+            # Add all enemies detected by each scout to the targets
+            for enemy in self.communication_data["detected_enemies"].get(scout_id, []):
+                self.communication_data["targets"][enemy["id"]] = enemy["position"]
+
+        # Communicate targets to artillery units
+        living_artillery = [artillery for artillery in self.friendly_agents
+                            if artillery["type"] == "artillery" and artillery["health"] > 0]
+
+        for artillery in living_artillery:
+            self.communication_data["network"][artillery["id"]].append(commander_id)
+            self.episode_comm_stats['commander_to_artillery'][commander_id] += 1
+            logging.info(f"Commander {commander_id} communicated with Artillery {artillery['id']}")
 
     def _move_agent(self, agent, action):
         """
@@ -746,24 +760,35 @@ class CombinedArmsRLEnvMAComms(gym.Env):
         def calculate_agent_reward(agent):
             reward = 0
             # Base step penalty
-            reward -= 0.001
+            reward -= 0.0005  # Changed from 0.001 to potentially encourage more exploration.
 
             # Detection reward
             if agent["detected"]:
-                reward += 0.05
+                reward += 0.1  # Changed from 0.05 to encourage scouts to actively search - first step in kill chain
 
             # Firing reward/penalty
             if agent["fired"]:
-                reward += 0.5 if agent["hit"] else -0.05
+                reward += 1.0 if agent["hit"] else -0.1  # Changed from 0.5 and -0.05 to emphasize offensive actions
 
             # Communication reward
-            if agent["type"] == "scout" and agent["id"] in self.communication_data["network"].values():
-                reward += 0.1
-            elif agent["type"] == "commander" and self.communication_data["network"][agent["id"]]:
-                reward += 0.2
+            if agent["type"] == "scout":
+                # Reward for successful communication (i.e., if the scout's ID is in any commander's network)
+                if any(agent["id"] in commander_network
+                       for commander_network in self.communication_data["network"].values()):
+                    reward += 0.2  # Changed from 0.1
+            elif agent["type"] == "commander":
+                # Reward for successful communication (i.e., if the commander's ID is in any artillery's network)
+                if any(agent["id"] in artillery_network
+                       for artillery_network in self.communication_data["network"].values()):
+                    reward += 0.3  # Changed from 0.2
             elif agent["type"] == "artillery" and agent["fired"] and agent["hit"]:
+                # Check if the hit target was in the communicated targets
                 if agent["target_pos"] in self.communication_data["targets"].values():
-                    reward += 0.3
+                    reward += 0.5  # Changed from 0.3 - this is the culminating step in the kill chain.
+
+            # Destruction reward
+            if agent["health"] == 0 and agent.get("just_died", True):
+                reward -= 2.0  # Changed from -1.0 to emphasize destroy the enemy before being destroyed.
 
             return reward
 
@@ -779,9 +804,9 @@ class CombinedArmsRLEnvMAComms(gym.Env):
             return destroyed_health / initial_health
 
         def calculate_team_reward(team_strength, opponent_destruction):
-            strength_weight = 0.4
-            destruction_weight = 0.6
-            return (strength_weight * team_strength + destruction_weight * opponent_destruction) * 2
+            strength_weight = 0.3  # Changed from 0.4
+            destruction_weight = 0.7  # Changed from 0.6 to emphasize more destruction of enemy
+            return (strength_weight * team_strength + destruction_weight * opponent_destruction) * 1.5  # Changed from 2
 
         # Calculate individual rewards for this step
         for i, agent in enumerate(self.friendly_agents):
@@ -1161,7 +1186,7 @@ if __name__ == "__main__":
         "commander": {"count": 1, "positions": [(4, 62)]}
     }
 
-    env = CombinedArmsRLEnvMAComms(friendly_config, enemy_config, render_speed=0.5, max_steps=2000,
+    env = CombinedArmsRLEnvMAComms(friendly_config, enemy_config, render_speed=0.05, max_steps=2000,
                                    render_mode='human')
 
     observation = env.reset()
